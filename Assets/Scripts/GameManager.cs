@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
-using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour
 
     public void ChangeColor()
     {
-        gradientObject.m_color1 = color1;
-        gradientObject.m_color2 = color2;
+        //gradientObject.m_color1 = color1;
+        //gradientObject.m_color2 = color2;
     }
 
     public void ToggleSetttingsMenu()
