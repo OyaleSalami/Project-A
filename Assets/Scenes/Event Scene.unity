@@ -846,10 +846,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   path: C:\Users\Oyale\Documents\png
+  imagesLoaded: 0
   textures: []
-  mumbleTex: {fileID: 2100000, guid: 12ee13aea0683e6499e480addb776300, type: 2}
   displayImage: {fileID: 1742452743}
-  displayImageSize: {x: 500, y: 500}
+  selectedImageIndex: 0
+  mumbleTex: {fileID: 2100000, guid: 12ee13aea0683e6499e480addb776300, type: 2}
 --- !u!1 &652623210
 GameObject:
   m_ObjectHideFlags: 0
@@ -1486,7 +1487,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 720, y: 1600}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.75
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
