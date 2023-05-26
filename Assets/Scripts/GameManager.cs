@@ -1,8 +1,22 @@
+
+/* Unmerged change from project 'Assembly-CSharp.Player'
+Before:
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+After:
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+*/
+using UnityEngine
+/* Unmerged change from project 'Assembly-CSharp.Player'
+Before:
+using System.Collections;
+After:
+using UnityEngine.UI;
+*/
+;
 
 public class GameManager : MonoBehaviour
 {
@@ -32,7 +46,7 @@ public class GameManager : MonoBehaviour
     {
         settingsToggled = !settingsToggled;
 
-        if(settingsToggled == true)
+        if (settingsToggled == true)
         {
             MainMenu.SetActive(false);
             ProfileMenu.SetActive(false);
@@ -48,7 +62,7 @@ public class GameManager : MonoBehaviour
 
     public void ToggleProfileMenu()
     {
-        profileToggled =!profileToggled;
+        profileToggled = !profileToggled;
 
         if (profileToggled == true)
         {

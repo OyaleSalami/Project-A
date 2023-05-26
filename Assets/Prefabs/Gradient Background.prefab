@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3277294658202595677}
   - component: {fileID: 3277294658202595676}
   - component: {fileID: 3277294658202595678}
+  - component: {fileID: -2216803963242983268}
   m_Layer: 5
   m_Name: Gradient Background
   m_TagString: Untagged
@@ -88,7 +89,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbbcfc4f2bd4baa4f8580dbbc1fa0f47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_color1: {r: 0.4838098, g: 0.9056604, b: 0.34603062, a: 1}
-  m_color2: {r: 0.764151, g: 0.5534197, b: 0.3280082, a: 1}
+  m_color1: {r: 0.26326096, g: 0.6415094, b: 0.6222124, a: 1}
+  m_color2: {r: 0.16470589, g: 0.047058824, b: 0.30588236, a: 1}
   m_angle: -4
   m_ignoreRatio: 1
+--- !u!114 &-2216803963242983268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3277294658202595674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d7958760e94fc2498779108c4b5cc0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
