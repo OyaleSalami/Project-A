@@ -19,7 +19,7 @@ public class EventMenu : MonoBehaviour
     [Header("Displayed Image")]
     [SerializeField] Image displayImage; //The image currently displayed
     [SerializeField] int selectedImageIndex = 0; //Its index in the list
-
+    [SerializeField] Image completedImage; //The completed image on the game board (Game scene)
     [SerializeField] Material mumbleTex; //Prefab for the image for the game board
 
     // Start is called before the first frame update
@@ -80,9 +80,14 @@ public class EventMenu : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene("Game Scene", LoadSceneMode.Single);
-            //TODO: Set the selected image as image on the game board
+            //Set the selected image as Image/Completed_Image on the game board
             mumbleTex.mainTexture = textures[selectedImageIndex];
+
+            completedImage.sprite = Sprite.Create(textures[selectedImageIndex],
+               new Rect(Vector2.zero, new Vector2(textures[selectedImageIndex].width, textures[selectedImageIndex].height)),
+               Vector2.zero);
+
+            SceneManager.LoadScene("Game Scene", LoadSceneMode.Single);
         }
     }
 
@@ -108,7 +113,7 @@ public class EventMenu : MonoBehaviour
         }
         else
         {
-            selectedImageIndex -= 1;
+            selectedImageIndex = selectedImageIndex - 1;
         }
         UpdateImage();
     }

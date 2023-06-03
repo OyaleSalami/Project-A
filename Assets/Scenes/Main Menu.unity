@@ -1106,7 +1106,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: f17e83a5e6824ae489415835a1c35342, type: 3}
+    m_Font: {fileID: 12800000, guid: 91f8e4f98a686624d919b02a5bd4a791, type: 3}
     m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 1
@@ -1118,7 +1118,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: MUMBLE
+  m_Text: MUMBLE Jumble
 --- !u!222 &957267987
 CanvasRenderer:
   m_ObjectHideFlags: 0

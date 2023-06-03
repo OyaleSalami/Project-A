@@ -1,16 +1,147 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using static UnityEngine.Mathf;
 
 public class LevelManager : MonoBehaviour
 {
+    [Header("Game Board")]
     [SerializeField] private Transform gameTransform;
     [SerializeField] private Transform piecePrefab;
+
+    [Header("Timer")]
+    private Clock clock;
+    [SerializeField] bool countdown = false;
+    [SerializeField] Text timerText;
+    [SerializeField] float timer = 0;
 
     private List<Transform> pieces;
     private int emptyLocation;
     private int size;
     private bool shuffling = false;
+
+    void Start()
+    {
+        pieces = new List<Transform>();
+        size = 4;
+        CreateGamePieces(0.005f);
+        clock = new Clock(0, 10, 20); //10 minutes timer
+    }
+    
+    void Update()
+    {
+        //check for completion
+        if (!shuffling && CheckCompletion())
+        {
+            shuffling = true;
+            StartCoroutine(WaitShuffle(2f));
+        }
+
+        //on click send out ray to see if we clicked on a piece
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                if (pieces[i] == hit.transform)
+                {
+                    //check each direction to see if valid move
+                    //we break out on the sucess so we dont carry on and swap back again
+                    if (SwapIfValid(i, -size, size)) { break; }
+                    if (SwapIfValid(i, +size, size)) { break; }
+                    if (SwapIfValid(i, -1, 0)) { break; }
+                    if (SwapIfValid(i, +1, size - 1)) { break; }
+                }
+            }
+
+        }
+
+        //Updating the Timer
+        timer += Time.deltaTime;
+        if(timer >= 1)
+        {
+            clock.DecreaseTime(1);
+            timer = 0;
+
+            //Update the display
+            timerText.text = clock.ToString();
+        }
+    }
+
+    class Clock
+    {
+        public int hour;
+        public int minute;
+        public int seconds;
+
+        public Clock(int h = 0, int m = 0, int s = 0)
+        {
+            hour = h;
+            minute = m;
+            seconds = s;
+        }
+
+        public void IncreaseTime(int s)
+        {
+            if((seconds + 1) > 60)
+            {
+                minute += 1;
+                seconds = 0;
+            }
+            else
+            {
+                seconds += 1;
+                return;
+            }
+
+            if((minute + 1) > 60)
+            {
+                hour += 1;
+                minute = 0;
+            }
+            else
+            {
+                minute += 1;
+                return;
+            }
+        }
+        public void DecreaseTime(int s)
+        {
+            if ((seconds - 1) < 0)
+            {
+                seconds = 59;
+            }
+            else
+            {
+                seconds -= 1;
+                return;
+            }
+
+            if ((minute - 1) < 0)
+            {
+                hour -= 1;
+                minute = 59;
+            }
+            else
+            {
+                minute -= 1;
+                return;
+            }
+        }
+
+        override public string ToString()
+        {
+            if(seconds < 10)
+            {
+                return (minute + ":0" + seconds);
+            }
+            else
+            {
+                return (minute + ":" + seconds);
+            }
+        }
+    }
 
     private void CreateGamePieces(float gapThickness)
     {
@@ -45,42 +176,7 @@ public class LevelManager : MonoBehaviour
             }
         }
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        pieces = new List<Transform>();
-        size = 4;
-        CreateGamePieces(0.005f);
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        //check for completion
-        if (!shuffling && CheckCompletion())
-        {
-            shuffling = true;
-            StartCoroutine(WaitShuffle(2f));
-        }
-
-        //on click send out ray to see if we clicked on a piece
-        if (Input.GetMouseButtonDown(0))
-        {
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            for (int i = 0; i < pieces.Count; i++)
-            {
-                if (pieces[i] == hit.transform)
-                {
-                    //check each direction to see if valid move
-                    //we break out on the sucess so we dont carry on and swap back again
-                    if (SwapIfValid(i, -size, size)) { break; }
-                    if (SwapIfValid(i, +size, size)) { break; }
-                    if (SwapIfValid(i, -1, 0)) { break; }
-                    if (SwapIfValid(i, +1, size - 1)) { break; }
-                }
-            }
-
-        }
-    }
+    
     //colCheck is used to stop horizontal moves wrapping
     private bool SwapIfValid(int i, int offset, int colCheck)
     {
