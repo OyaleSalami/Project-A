@@ -18,25 +18,33 @@ public class EventMenu : MonoBehaviour
 
     [Header("Displayed Image")]
     [SerializeField] Image displayImage; //The image currently displayed
+    [SerializeField] Image finalDisplayImage; //The image currently displayed
     [SerializeField] int selectedImageIndex = 0; //Its index in the list
     [SerializeField] Image completedImage; //The completed image on the game board (Game scene)
     [SerializeField] Material mumbleTex; //Prefab for the image for the game board
 
-    // Start is called before the first frame update
+    AudioSource errorSound;
+
     void Start()
     {
         dataPath = Application.dataPath;
         dataPath += "/Mumble";
-
+        errorSound = GetComponent<AudioSource>();
         GetImages();
     }
 
-    public void GetImages()
+    public void GetImages(string _imagePath = "")
     {
-        //Get all the picture files in the directory
         List<string> filePaths = new List<string>();
-        filePaths.AddRange(Directory.GetFiles(path, "*.png")); //Add all the png images!
-        filePaths.AddRange(Directory.GetFiles(path, "*.jpg")); //Add all the jpg images!
+        
+        if (_imagePath != "")
+        {
+            filePaths.Add(_imagePath); //Add all the uploaded image!
+        }
+
+        //Get all the picture files in the directory (Png, Jpg)
+        filePaths.AddRange(Directory.GetFiles(path, "*.png"));
+        filePaths.AddRange(Directory.GetFiles(path, "*.jpg"));
 
         //Resize the texture list to the no of files found
         textures = new List<Texture2D>(filePaths.Count);
@@ -49,16 +57,17 @@ public class EventMenu : MonoBehaviour
                 byte[] imageData = File.ReadAllBytes(filePaths[i]);
 
                 textures.Add(new Texture2D(2,2));
-                Debug.Log(textures.Count);
 
                 //Convert the series of bytes to a texture
-                if (ImageConversion.LoadImage(textures[i], imageData) == true)
+                if (ImageConversion.LoadImage(textures[i], imageData) != true)
                 {
+                    errorSound.Play();
                     Debug.Log("Error Converting The Image!");
                 }
             }
             catch (Exception e)
             {
+                errorSound.Play();
                 Debug.Log("Error Loading Image (" + filePaths[i] + "): " +  e);
             }
         }
@@ -118,6 +127,7 @@ public class EventMenu : MonoBehaviour
         UpdateImage();
     }
 
+    /// <summary>Update the image displayed!!</summary>
     public void UpdateImage()
     {
         if (imagesLoaded <= 0)
@@ -130,6 +140,10 @@ public class EventMenu : MonoBehaviour
             displayImage.sprite = Sprite.Create(textures[selectedImageIndex],
                new Rect(Vector2.zero, new Vector2(textures[selectedImageIndex].width, textures[selectedImageIndex].height)),
                Vector2.zero);
+
+            finalDisplayImage.sprite = Sprite.Create(textures[selectedImageIndex],
+               new Rect(Vector2.zero, new Vector2(textures[selectedImageIndex].width, textures[selectedImageIndex].height)),
+               Vector2.zero);
         }
     }
 
@@ -138,11 +152,13 @@ public class EventMenu : MonoBehaviour
         string filePath = ""; //Path to the image to be uploaded
         try
         {
+            //Get the file to upload
             filePath = EditorUtility.OpenFilePanel("Choose Image To Upload", "", "");
         }
         catch (Exception e)
         {
             Debug.LogError("Error Uploading File (" + filePath + "): " + e);
+            errorSound.Play();
             filePath = "";
             return;
         }
@@ -151,10 +167,15 @@ public class EventMenu : MonoBehaviour
         {
             Debug.Log("Uploaded a New Event: " + filePath);
             //TODO: Move unto the payment page and stuff
+
+            //DEMO: For testing
+            GetImages(filePath);
         }
         else
         {
+            errorSound.Play();
             Debug.Log("Error Uploading New Event: " + filePath);
         }
     }
+
 }

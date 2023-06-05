@@ -46,6 +46,7 @@ public class LevelManager : MonoBehaviour
             {
                 if (pieces[i] == hit.transform)
                 {
+                    Debug.Log("Hit something");
                     //check each direction to see if valid move
                     //we break out on the sucess so we dont carry on and swap back again
                     if (SwapIfValid(i, -size, size)) { break; }

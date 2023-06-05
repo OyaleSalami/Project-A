@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 963d2db7bc7df9c4b9f919549d74c573
+guid: d335b18b828a60f4687b9aeebabca0e8
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - QuinqueFive
+  - Gabriola
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
