@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Menu.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/Scenes/Event Scene.unity
+    path: Assets/Scenes/Daily Event Scene.unity
     guid: 427ae7cd52265e444a2e5d8ef5a60223
   - enabled: 1
     path: Assets/Scenes/Game Scene.unity
@@ -17,4 +17,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Profile Scene.unity
     guid: e5918aa546b646d4ea8b81320bfe6941
+  - enabled: 1
+    path: Assets/Scenes/Stats Scene.unity
+    guid: e73af058616ed144c9bee82d8cf5c98c
+  - enabled: 1
+    path: Assets/Scenes/Event Scene.unity
+    guid: 32c9b1524c789ee42920596787f6bd1f
+  - enabled: 1
+    path: Assets/Scenes/Authentication.unity
+    guid: 003a69b3784cf814381fa61c45994596
   m_configObjects: {}

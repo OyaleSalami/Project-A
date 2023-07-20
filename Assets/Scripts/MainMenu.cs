@@ -1,83 +1,54 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] GameObject mainMenu;
-    [SerializeField] GameObject settingsMenu;
-    [SerializeField] GameObject infoMenu;
+    public Image dailyChallengeImage;
 
-    bool sound = true;
-    bool mainToggled = true;
-    bool infoToggled = false;
-    bool settingsToggled = false;
-
-    void Start()
+    #region Scene Change
+    public void PlayDailyChallenge()
     {
+        SceneManager.LoadScene("Daily Event Scene", LoadSceneMode.Single);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void Play()
+    public void PlayGeneralChallenges()
     {
         SceneManager.LoadScene("Event Scene", LoadSceneMode.Single);
     }
 
-    public void Profile()
+    public void LoadProfileScene()
     {
         SceneManager.LoadScene("Profile Scene", LoadSceneMode.Single);
     }
 
-    public void Rate()
+    public void LoadStatsScene()
     {
-        Debug.Log("Rate our app on the playstore!");
+        Debug.Log("Here are your stats!");
     }
 
-    public void ChangeTheme()
+    public void LoadAchievmentsScene()
     {
-        Background.UpdateColor();
+        Debug.Log("Here are your achievements!");
+        //TODO: Call Playgames achievement API
     }
 
-    public void ToggleSound()
+    public void LoadLeaderboardsScene()
     {
-        sound = !sound;
+        Debug.Log("Here is the leaderboard!");
+        //TODO: Call Playgames leaderboard API
+    }
+    #endregion
+
+    public void CheckDailyEvents()
+    {
+        //Check cloud and download the images
+        //TODO: Check the folder for daily challenges
     }
 
-    public void ToggleSetttingsMenu()
+    public void UpdateDailyEvents()
     {
-        settingsToggled = !settingsToggled;
-        if (settingsToggled == true)
-        {
-            settingsMenu.SetActive(true);
-            mainMenu.SetActive(false);
-            infoMenu.SetActive(false);
-        }
-        else
-        {
-            mainMenu.SetActive(true);
-            infoMenu.SetActive(false);
-            settingsMenu.SetActive(false);
-        }
+        //dailyChallengeImage = _;
     }
 
-    public void ToggleInfoMenu()
-    {
-        infoToggled = !infoToggled;
-        if (infoToggled == true)
-        {
-            infoMenu.SetActive(true);
-            mainMenu.SetActive(false);
-            settingsMenu.SetActive(false);
-        }
-        else
-        {
-            mainMenu.SetActive(true);
-            infoMenu.SetActive(false);
-            settingsMenu.SetActive(false);
-        }
-    }
 }

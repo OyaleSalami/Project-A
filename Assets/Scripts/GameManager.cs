@@ -1,86 +1,34 @@
-
-/* Unmerged change from project 'Assembly-CSharp.Player'
-Before:
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-After:
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-*/
-using UnityEngine
-/* Unmerged change from project 'Assembly-CSharp.Player'
-Before:
-using System.Collections;
-After:
-using UnityEngine.UI;
-*/
-;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("Sound Control")]
-    public bool sound = true;
-
-    [Header("Color Gradient")]
-    [SerializeField] Color color1;
-    [SerializeField] Color color2;
-    [SerializeField] UIGradient gradientObject;
-
-    [Header("UI Control")]
-    [SerializeField] GameObject MainMenu;
-    [SerializeField] GameObject UtilityMenu;
-    [SerializeField] GameObject ProfileMenu;
-    [SerializeField] GameObject SettingsMenu;
-    private bool settingsToggled = false;
-    private bool profileToggled = false;
-
-    public void ChangeColor()
+    static GameManager instance = new GameManager();
+    public enum Themes:int
     {
-        //gradientObject.m_color1 = color1;
-        //gradientObject.m_color2 = color2;
+        Light,
+        Dark,
+        Moonlight
     }
 
-    public void ToggleSetttingsMenu()
+    [Header("Global Settings")]
+    [SerializeField] public static bool isMusic = true;
+    [SerializeField] public static bool isSoundEffects = true;
+    [SerializeField] public static bool noScreenTimeout = true;
+    [SerializeField] public static bool dailyNotifications = true;
+
+    [Header("Theme Settings")]
+    [SerializeField] public static Color textColor;
+    [SerializeField] public static Color buttonColor;
+    [SerializeField] public static Color backgroundColor;
+
+    private void Awake()
     {
-        settingsToggled = !settingsToggled;
-
-        if (settingsToggled == true)
+        if(instance != this)
         {
-            MainMenu.SetActive(false);
-            ProfileMenu.SetActive(false);
-            SettingsMenu.SetActive(true);
+            Destroy(this);
         }
-        else
-        {
-            MainMenu.SetActive(true);
-            ProfileMenu.SetActive(false);
-            SettingsMenu.SetActive(false);
-        }
-    }
-
-    public void ToggleProfileMenu()
-    {
-        profileToggled = !profileToggled;
-
-        if (profileToggled == true)
-        {
-            MainMenu.SetActive(false);
-            SettingsMenu.SetActive(false);
-            ProfileMenu.SetActive(true); //Disable the others and go to the Profile Menu
-        }
-        else
-        {
-            MainMenu.SetActive(true);
-            SettingsMenu.SetActive(false);
-            ProfileMenu.SetActive(false); //Go back to the Main Menu
-        }
-        Debug.Log("Toggled Profile");
-    }
-
-    public void ToggleSound(bool isSound)
-    {
-        sound = isSound;
+        DontDestroyOnLoad(gameObject);
     }
 }
