@@ -4,7 +4,8 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    static GameManager instance = new GameManager();
+    public static GameManager instance;
+
     public enum Themes:int
     {
         Light,
@@ -25,7 +26,11 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if(instance != this)
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
         {
             Destroy(this);
         }
