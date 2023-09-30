@@ -20,7 +20,7 @@ public class EventLine : MonoBehaviour
     public void AddEvent(string _id)
     {
         eventDisplays[index].SetActive(true);
-        eventDisplays[index].GetComponent<MumbleEvent>().thisEvent.eventId = _id;
+        eventDisplays[index].GetComponent<MumbleEvent>().thisEvent.event_id = _id;
         eventDisplays[index].GetComponent<MumbleEvent>().LoadImage();
         index++;
     }

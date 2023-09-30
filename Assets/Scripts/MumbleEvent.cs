@@ -30,7 +30,7 @@ public class MumbleEvent : MonoBehaviour
         //Download image and details from firebase and display
 
         //Get image reference
-        StorageReference imageReference = storageReference.Child("/events/" + thisEvent.eventId + ".jpeg");
+        StorageReference imageReference = storageReference.Child("/events/" + thisEvent.event_id + ".jpeg");
 
         //Get download link for file
         imageReference.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>

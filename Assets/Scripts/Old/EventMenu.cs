@@ -35,7 +35,7 @@ public class EventMenu : MonoBehaviour
 
     public void GetImages(string _imagePath = "")
     {
-        List<string> filePaths = new List<string>();
+        List<string> filePaths = new();
         
         if (_imagePath != "")
         {
@@ -122,7 +122,7 @@ public class EventMenu : MonoBehaviour
         }
         else
         {
-            selectedImageIndex = selectedImageIndex - 1;
+            selectedImageIndex--;
         }
         UpdateImage();
     }
@@ -153,7 +153,7 @@ public class EventMenu : MonoBehaviour
         try
         {
             //Get the file to upload
-            filePath = EditorUtility.OpenFilePanel("Choose Image To Upload", "", "");
+            //filePath = EditorUtility.OpenFilePanel("Choose Image To Upload", "", "");
         }
         catch (Exception e)
         {
