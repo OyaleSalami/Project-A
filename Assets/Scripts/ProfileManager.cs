@@ -1,10 +1,9 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ProfileManager : MonoBehaviour
 {
@@ -16,75 +15,23 @@ public class ProfileManager : MonoBehaviour
     [SerializeField] Text gamesPlayed;
     [SerializeField] Text playerUploaded;
 
-    [Header("Errors")]
-    [SerializeField] GameObject invalidUser;
-    [SerializeField] InfoDisplay infoDisplay;
-
     Dictionary<string, object> playerProfObj;
     Mumble.PlayerProfile playerProfile;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
-    DatabaseReference dbReference;
-
     void Start()
     {
-        Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        if (GameManager.instance.isFirebaseReady == true)
         {
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == Firebase.DependencyStatus.Available)
-            {
-                //Firebase.FirebaseApp.LogLevel = Firebase.LogLevel.Verbose;
-                InitializeFirebase();
-                if(CheckUserProfile() == true)
-                {
-                    GetPlayerDetails();
-                }
-            }
-            else
-            {
-                Debug.LogError(string.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus.ToString()));
-                // Firebase Unity SDK is not safe to use here.
-            }
-        });
-    }
-
-    // Handle initialization of the necessary firebase modules:
-    void InitializeFirebase()
-    {
-        auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-        auth.StateChanged += AuthStateChanged;
-        AuthStateChanged(this, null);
-
-        dbReference = FirebaseDatabase.DefaultInstance.RootReference;
-    }
-
-    // Track state changes of the auth object.
-    void AuthStateChanged(object sender, System.EventArgs eventArgs)
-    {
-        if (auth.CurrentUser != user)
+            //CheckUserProfile();
+            GetPlayerDetails();
+        }
+        else
         {
-            bool signedIn = user != auth.CurrentUser && auth.CurrentUser != null;
-            if (!signedIn && user != null)
-            {
-                infoDisplay.DisplayMessage("Signed out: " + user.UserId);
-            }
-            user = auth.CurrentUser;
-            if (signedIn)
-            {
-                infoDisplay.DisplayMessage("Signed in: " + user.UserId);
-            }
+            //TODO: Throw an error
         }
     }
 
-    // Handle removing subscription and reference to the Auth instance.
-    // Automatically called by a Monobehaviour after Destroy is called on it.
-    void OnDestroy()
-    {
-        auth.StateChanged -= AuthStateChanged;
-        auth = null;
-    }
-
+    /* Check the player profile
     bool CheckUserProfile()
     {
         user = auth.CurrentUser;
@@ -105,18 +52,20 @@ public class ProfileManager : MonoBehaviour
             return false;
         }
     }
+    */
 
     void GetPlayerDetails()
     {
-        FirebaseDatabase.DefaultInstance.GetReference("users").Child("+2348141840885")
-            .GetValueAsync().ContinueWithOnMainThread(task => {
-              if (task.IsFaulted)
-              {
+        GameManager.instance.dbReference.Child("users").Child("+2348141840885")
+            .GetValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted)
+                {
                     // Handle the error...
                     Debug.LogError(task.Exception);
-              }
-              else if (task.IsCompleted)
-              {
+                }
+                else if (task.IsCompleted)
+                {
                     DataSnapshot snapshot = task.Result;
 
                     // Do something with snapshot...
@@ -125,7 +74,7 @@ public class ProfileManager : MonoBehaviour
 
                     playerProfile = new Mumble.PlayerProfile(playerProfObj);
                     UpdateUI();
-              }
+                }
             });
     }
 
@@ -141,16 +90,9 @@ public class ProfileManager : MonoBehaviour
 
     public void UpdateUI()
     {
-        if(playerProfile == null)
+        if (playerProfile == null)
         {
             return; //Exit if there is no valid player data
         }
-
-        playerName.text = playerProfile.number;
-        playerNumber.text = playerProfile.number;
-        playerUploaded.text = playerProfile.games_uploaded;
-        gamesPlayed.text = playerProfile.games_played;
-        gamesWon.text = playerProfile.games_won;
-        points.text = playerProfile.points;
     }
 }
