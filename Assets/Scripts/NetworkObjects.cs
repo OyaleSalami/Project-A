@@ -1,10 +1,88 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Mumble
 {
     [System.Serializable]
+    public class Comment
+    {
+        public string username;
+        public string comment;
+
+        public Comment()
+        {
+
+        }
+
+        public Comment(Dictionary<string, object> _comment)
+        {
+            try
+            {
+                username = _comment["username"].ToString();
+                comment = _comment["comment"].ToString();
+            }
+            catch(Exception e)
+            {
+                Debug.Log("Error creating comment: " + e);
+            }
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+    [System.Serializable]
+    public class Post
+    {
+        public int seen; //No of times the post was seen
+        public int likes; //No of likes per post
+        public int comments; //No of comments
+        public int saves; //No of saves
+        public string postId; //Post ID (Identifies post and comment sessions too)
+        public string description; //Description of the post
+        public string username; //Username of the person that posted it
+
+        public Post(Dictionary<string, object> _post)
+        {
+            try
+            {
+                seen = int.Parse(_post["posts"].ToString());
+                likes = int.Parse(_post["likes"].ToString());
+                comments = int.Parse(_post["comments"].ToString());
+                saves = int.Parse(_post["saves"].ToString());
+                postId = _post["postId"].ToString();
+                description = _post["description"].ToString();
+                username = _post["username"].ToString();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Error Creating Post: " + e);
+            }
+        }
+
+        [System.Obsolete] public Post(string json)
+        {
+            try
+            {
+                Dictionary<string, object> _post = (Dictionary<string, object>)JsonConvert.DeserializeObject(json);
+            }
+            catch(Exception e)
+            {
+                Debug.Log("Error Creating Post: " + e);
+            }
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+    [System.Serializable] [System.Obsolete]
     public class Event
     {
         public Event()
@@ -19,9 +97,9 @@ namespace Mumble
                 title = dict["title"].ToString();
                 event_id = dict["event_id"].ToString();
                 description = dict["description"].ToString();
-                countdown_time = (int)dict["countdown_time"];
-                times_played = (int)dict["times_played"];
-                times_won = (int)dict["times_won"];
+                countdown_time = int.Parse(dict["countdown_time"].ToString());
+                times_played = int.Parse(dict["times_played"].ToString());
+                times_won = int.Parse(dict["times_won"].ToString());
             }
             catch (Exception e)
             {
@@ -46,16 +124,34 @@ namespace Mumble
     [System.Serializable]
     public class PlayerProfile
     {
-        public PlayerProfile(Dictionary<string, object> dict)
+        public string username; //Player Username
+        public string phonenumber; //Player's phonenumber
+        public int postcount; //No of posts by the player
+        public int points; //Points the player has
+        public int gamesplayed; //No of games the player has played
+        public int gameswon; //No of games the player has won
+
+        public string[] posts; //List of posts uploaded by the player (their IDs)
+        public string[] saved; //List of posts saved by the player (their IDs)
+        public string[] liked; //List of posts like by the player (their IDs)
+
+        public PlayerProfile(Dictionary<string, object> prof)
         {
             try
             {
-                userName = dict["name"].ToString();
-                number = dict["number"].ToString();
-                points = dict["points"].ToString();
-                games_played = dict["games_played"].ToString();
-                games_won = dict["games_won"].ToString();
-                games_uploaded = dict["games_uploaded"].ToString();
+                username = prof["name"].ToString();
+                phonenumber = prof["phonenumber"].ToString();
+                postcount = int.Parse(prof["postcount"].ToString());
+                points = int.Parse(prof["points"].ToString());
+                gamesplayed = int.Parse(prof["games_played"].ToString());
+                gameswon = int.Parse(prof["games_won"].ToString());
+
+                /*
+                 * TODO: Get the lists for the other details
+                 * posts = 
+                 * saved = 
+                 * liked = 
+                */
             }
             catch (Exception e)
             {
@@ -63,21 +159,9 @@ namespace Mumble
             }
         }
 
-        /// <summary>The player's display name</summary>
-        public string userName { get; set; }
-        /// <summary>The player's number</summary>
-        public string number { get; set; }
-        /// <summary>The player's current points</summary>
-        public string points { get; set; }
-        /// <summary>The number of games played by the user</summary>
-        public string games_played { get; set; }
-        /// <summary>The number of games won by the user</summary>
-        public string games_won { get; set; }
-        /// <summary>The number of games uploaded by the user</summary>
-        public string games_uploaded { get; set; }
-        /// <summary>List of the event hashes</summary>
-        public string[] events { get; set; }
+        [System.Obsolete] public PlayerProfile(string json)
+        {
+            JsonConvert.DeserializeObject(json);
+        }
     }
-
-
 }

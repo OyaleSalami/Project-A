@@ -2,6 +2,10 @@
   <packages>
     <package>com.google.android.gms:play-services-base:18.2.0</package>
     <package>com.google.firebase:firebase-analytics:21.3.0</package>
+    <package>com.google.firebase:firebase-appcheck:17.0.1</package>
+    <package>com.google.firebase:firebase-appcheck-debug:17.0.1</package>
+    <package>com.google.firebase:firebase-appcheck-playintegrity:17.0.1</package>
+    <package>com.google.firebase:firebase-appcheck-unity:11.2.0</package>
     <package>com.google.firebase:firebase-app-unity:11.2.0</package>
     <package>com.google.firebase:firebase-auth:22.0.0</package>
     <package>com.google.firebase:firebase-auth-unity:11.2.0</package>
@@ -63,7 +67,11 @@
     <file>Assets/Plugins/Android/com.google.errorprone.error_prone_annotations-2.14.0.jar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-analytics-21.3.0.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-annotations-16.2.0.jar</file>
+    <file>Assets/Plugins/Android/com.google.firebase.firebase-appcheck-17.0.1.aar</file>
+    <file>Assets/Plugins/Android/com.google.firebase.firebase-appcheck-debug-17.0.1.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-appcheck-interop-17.0.1.aar</file>
+    <file>Assets/Plugins/Android/com.google.firebase.firebase-appcheck-playintegrity-17.0.1.aar</file>
+    <file>Assets/Plugins/Android/com.google.firebase.firebase-appcheck-unity-11.2.0.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-app-unity-11.2.0.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-auth-22.0.0.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-auth-interop-20.0.0.aar</file>

@@ -3,17 +3,23 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public void PlayGeneralChallenges()
+    [SerializeField] GameObject mainMenu;
+    [SerializeField] GameObject settingsMenu;
+
+    void Update()
     {
-        SceneManager.LoadScene("Event Scene", LoadSceneMode.Single);
+        if(Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
-    public void LoadProfileScene()
+    public void LoadProfile()
     {
         SceneManager.LoadScene("Profile Scene", LoadSceneMode.Single);
     }
 
-    public void LoadUploadScene()
+    public void PostEvent()
     {
         SceneManager.LoadScene("Upload Scene", LoadSceneMode.Single);
     }
