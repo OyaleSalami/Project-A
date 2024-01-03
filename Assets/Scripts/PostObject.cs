@@ -87,8 +87,7 @@ public class PostObject : MonoBehaviour
                     DataSnapshot snapshot = task.Result;
 
                     // Do something with snapshot...
-                    Dictionary<string, object> dict = new Dictionary<string, object>();
-                    dict = (Dictionary<string, object>)snapshot.Value;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)snapshot.Value;
 
                     thisPost = new Post(dict);
                     LoadImage();

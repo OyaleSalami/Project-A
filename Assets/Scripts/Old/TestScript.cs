@@ -40,6 +40,7 @@ public class TestScript : MonoBehaviour
                 displayImage.sprite = Sprite.Create(texture,
                                 new Rect(Vector2.zero, new Vector2(texture.width, texture.height)),
                                 Vector2.zero);
+                displayImage.preserveAspect = true;
             }
         }
     }

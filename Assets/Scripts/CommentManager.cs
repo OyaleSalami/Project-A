@@ -1,20 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 using Mumble;
+using Firebase.Extensions;
 
 public class CommentManager : MonoBehaviour
 {
+    public string postId; //Id of the post that has the comments
     public List<string> comments; //List of comment IDs
-    public List<GameObject> commentObjects; //Reference to the comment object
+    public List<GameObject> commentObjects; //Reference to the comment objects
 
+    [Header("UI")]
     [SerializeField] GameObject commentAnchor;
     [SerializeField] GameObject commentPrefab;
     [SerializeField] GameObject prevComment;
     [SerializeField] RectTransform scrollViewContentHolder;
 
     void Update()
-    {
+    { 
+        //TODO: Change the button mapping to register the back button
         if(Input.GetKey(KeyCode.Escape))
         {
             gameObject.SetActive(false);
@@ -43,16 +48,26 @@ public class CommentManager : MonoBehaviour
     }
 
     //Add a comment to a post
-    public void AddComment(string postID, string comment)
+    public void AddNewComment(string comment)
     {
-        Comment tempComment = new Comment();
+        Comment temp = new Comment(comment, GameManager.instance.user.DisplayName, 0);
 
         //TODO: Push the comment to the database
-        string key = GameManager.instance.dbReference.Child("events").Push().Key; //Get the event ID
-    }
+        string key = GameManager.instance.dbReference.Child("comments").Child(postId).Push().Key; //Get the event ID
+        string output = JsonConvert.SerializeObject(temp);
 
-    public void ClearComments()
-    {
-
+        GameManager.instance.dbReference.Child("events").Child(postId).Child(key).SetRawJsonValueAsync(output).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted || task.IsCanceled)
+            {
+                Debug.Log(task.Exception.ToString());
+            }
+            else
+            {
+                //Add event to active list of events (Only if the event uploaded successfully)
+                GameManager.instance.dbReference.Child("event_list").Push().SetValueAsync(key);
+            }
+        }
+        );
     }
 }

@@ -5,15 +5,22 @@ using Newtonsoft.Json;
 
 namespace Mumble
 {
-    [System.Serializable]
-    public class Comment
+    [System.Serializable] public class Comment
     {
         public string username;
         public string comment;
+        public int likes;
 
         public Comment()
         {
 
+        }
+
+        public Comment(string _comment, string _username, int _likes)
+        {
+            username = _username;
+            comment = _comment;
+            likes = _likes;
         }
 
         public Comment(Dictionary<string, object> _comment)
@@ -22,6 +29,7 @@ namespace Mumble
             {
                 username = _comment["username"].ToString();
                 comment = _comment["comment"].ToString();
+                likes = int.Parse(_comment["likes"].ToString());
             }
             catch(Exception e)
             {
@@ -35,17 +43,27 @@ namespace Mumble
         }
     }
 
-    [System.Serializable]
-    public class Post
+    [System.Serializable] public class Post
     {
         public int seen; //No of times the post was seen
         public int likes; //No of likes per post
         public int comments; //No of comments
         public int saves; //No of saves
-        public string postId; //Post ID (Identifies post and comment sessions too)
+        public string postId; //Post ID (Identifies post and comment sections)
         public string description; //Description of the post
         public string username; //Username of the person that posted it
 
+        //Creating a blank post object
+        public Post()
+        {
+            seen = 0;
+            likes = 0;
+            comments = 0;
+            saves = 0;
+            //TODO: username = GameManager.instance.user.DisplayName; 
+        }
+
+        //Re-Create a post object from a dictionary
         public Post(Dictionary<string, object> _post)
         {
             try
@@ -64,7 +82,8 @@ namespace Mumble
             }
         }
 
-        [System.Obsolete] public Post(string json)
+        //Create a post object from a Json file/string
+        public Post(string json)
         {
             try
             {
@@ -76,6 +95,7 @@ namespace Mumble
             }
         }
 
+        //Return the object as a Json string
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
@@ -121,8 +141,7 @@ namespace Mumble
         public int times_won { get; }
     }
 
-    [System.Serializable]
-    public class PlayerProfile
+    [System.Serializable] public class PlayerProfile
     {
         public string username; //Player Username
         public string phonenumber; //Player's phonenumber
