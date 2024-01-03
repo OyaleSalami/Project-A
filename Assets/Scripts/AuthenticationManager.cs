@@ -2,185 +2,177 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Firebase.Auth;
-using Firebase.Extensions;
 
 public class AuthenticationManager : MonoBehaviour
 {
-    [Header("Objects")]
-    [SerializeField] GameObject phone;
-    [SerializeField] GameObject otp;
+    [Header("Login Inputs")]
+    [SerializeField] InputField email;
+    [SerializeField] InputField password;
+
+    [Header("Sign Up Inputs")]
+    [SerializeField] InputField email2;
+    [SerializeField] InputField password2;
+    [SerializeField] InputField confirmPassword;
+
+    [Header("Error & Feedback")]
+    [SerializeField] Text feedback;
     [SerializeField] GameObject successPanel;
-
-    [Header("Inputs")]
-    [SerializeField] Text phoneInput;
-    [SerializeField] Text otpInput;
-
-    [Header("Errors")]
-    [SerializeField] GameObject errorText;
-    [SerializeField] InfoDisplay infoDisplay;
-
-    FirebaseAuth auth;
-    FirebaseUser user;
-    PhoneAuthProvider provider;
-
-    string phoneNumber;
-    string verId;
-    [SerializeField] int timeOut = 200; //200 sceonds
 
     void Start()
     {
-        Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        if(GameManager.instance.isFirebaseReady == true)
         {
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == Firebase.DependencyStatus.Available)
-            {
-                Firebase.FirebaseApp.LogLevel = Firebase.LogLevel.Verbose;
-                InitializeFirebase();
-            }
-            else
-            {
-                infoDisplay.DisplayError(string.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus.ToString()));
-                Debug.LogError(string.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus.ToString()));
-                // Firebase Unity SDK is not safe to use here.
-            }
-        });
-    }
-
-    // Handle initialization of the necessary firebase modules:
-    void InitializeFirebase()
-    {
-        auth = FirebaseAuth.DefaultInstance;
-        auth.StateChanged += AuthStateChanged;
-        AuthStateChanged(this, null);
-    }
-
-    // Track state changes of the auth object.
-    void AuthStateChanged(object sender, System.EventArgs eventArgs)
-    {
-        if (auth.CurrentUser != user)
-        {
-            bool signedIn = (user != auth.CurrentUser && auth.CurrentUser != null);
-            if (!signedIn && user != null)
-            {
-                Debug.Log("Signed out: " + user.UserId);
-            }
-            user = auth.CurrentUser;
-            if (signedIn)
-            {
-                Debug.Log("Signed in: " + user.UserId);
-            }
         }
     }
 
-    // Handle removing subscription and reference to the Auth instance.
-    // Automatically called by a Monobehaviour after Destroy is called on it.
-    void OnDestroy()
+    ///<returns>True if the input is valid</returns>
+    public bool CheckLoginInputs()
     {
-        auth.StateChanged -= AuthStateChanged;
-        auth = null;
+        if(email.text == "" || email.text == null)
+        {
+            feedback.text = "Fill in the email field!";
+            Invoke(nameof(ClearFeedback), 3f);
+            return false;
+        }
+        if(password.text == "" || password == null)
+        {
+            feedback.text = "Fill in the password field!";
+            Invoke(nameof(ClearFeedback), 3f);
+            return false;
+        }
+        return true;
     }
 
-    public void SubmitPhone()
+    ///<returns>True if the input is valid</returns>
+    public bool CheckRegisterInputs()
     {
-        //Set the phone number
-        phoneNumber = FormatPhoneNumber(phoneInput.GetComponent<Text>().text);
-        if (phoneNumber.Length != 14)
+        if(email2.text == "" || email2.text == null)
         {
-            errorText.SetActive(true);
-            errorText.GetComponent<Text>().text = "Invalid Phone Number";
-            infoDisplay.DisplayError("Invalid Phone Number!");
+            feedback.text = "Enter a valid email";
+            Invoke(nameof(ClearFeedback), 3f);
+            return false;
+        }
+        if (password2.text == "" || password2.text == null)
+        {
+            feedback.text = "Fill the password field!";
+            Invoke(nameof(ClearFeedback), 3f);
+            return false;
+        }
+        if(password2.text != confirmPassword.text)
+        {
+            feedback.text = "The passwords don't match!";
+            Invoke(nameof(ClearFeedback), 3f);
+            return false;
+        }
+        return true;
+    }
+
+    public void ForgotPassword()
+    {
+        if (email.text == "" || email.text == null)
+        {
+            feedback.text = "Enter a valid email!";
+            Invoke(nameof(ClearFeedback), 3f);
             return;
         }
 
-        phone.SetActive(false);
-        provider = PhoneAuthProvider.GetInstance(auth);
+        if (GameManager.instance.user != null)
+        {
+            GameManager.instance.auth.SendPasswordResetEmailAsync(email.text).ContinueWith(
+                task => {
+                if (task.IsCanceled)
+                {
+                    feedback.text = "Forgot Password was canceled.";
+                    Invoke(nameof(ClearFeedback), 3f);
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("SendPasswordResetEmailAsync encountered an error: " + task.Exception);
+                    feedback.text = "Forgot Password encountered an error.";
+                    Invoke(nameof(ClearFeedback), 3f);
+                    return;
+                }
 
-        provider.VerifyPhoneNumber(
-          new PhoneAuthOptions
-          {
-              PhoneNumber = phoneNumber,
-              TimeoutInMilliseconds = (uint)timeOut * 1000,
-              ForceResendingToken = null
-          },
-          verificationCompleted: (credential) =>
-          {
-              // Auto-sms-retrieval or instant validation has succeeded (Android only).
-              // There is no need to input the verification code.
-              // `credential` can be used instead of calling GetCredential().
-              infoDisplay.DisplayMessage("Successfully Signed In");
-              successPanel.SetActive(true);
-          },
-          verificationFailed: (error) =>
-          {
-              // The verification code was not sent.
-              // `error` contains a human readable explanation of the problem.
-              infoDisplay.DisplayError("Error: " + error);
-          },
-          codeSent: (id, token) =>
-          {
-              // Verification code was successfully sent via SMS.
-              // `id` contains the verification id that will need to passed in with
-              // the code from the user when calling GetCredential().
-              // `token` can be used if the user requests the code be sent again, to
-              // tie the two requests together.
-              otp.SetActive(true);
-              verId = id;
-          },
-          codeAutoRetrievalTimeOut: (id) =>
-          {
-              // Called when the auto-sms-retrieval has timed out, based on the given
-              // timeout parameter.
-              // `id` contains the verification id of the request that timed out.
-              otp.SetActive(true);
-              verId = id;
-          });
+                feedback.text = "Password Reset email has been sent.";
+                Debug.Log("Password reset email sent successfully.");
+                Invoke(nameof(Clear), 4f);
+            });
+        }
     }
 
-    public void SubmitOTP(string otp)
+    public void Login()
     {
-        PhoneAuthCredential cred = provider.GetCredential(verId, otp);
+        if (CheckLoginInputs() == false) { return; }
 
-        auth.SignInAndRetrieveDataWithCredentialAsync(cred).ContinueWith(task =>
-        {
-            if (task.IsFaulted)
+        GameManager.instance.auth.SignInWithEmailAndPasswordAsync(email.text, password.text).ContinueWith(
+            task => 
             {
-                infoDisplay.DisplayMessage("SignInAndRetrieveDataWithCredentialAsync encountered an error: " +
-                               task.Exception);
-                return;
-            }
+                if (task.IsCanceled)
+                {
+                    feedback.text = "Login Cancelled!";
+                    Invoke(nameof(ClearFeedback), 4f);
+                    return;
+                }
+                if(task.IsFaulted)
+                {
+                    Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                    feedback.text = "Sign In Encountered a problem";
+                    Invoke(nameof(ClearFeedback), 4f);
+                    return;
+                }
 
-            FirebaseUser newUser = task.Result.User;
-            infoDisplay.DisplayMessage("User signed in successfully");
+                AuthResult result = task.Result;
+                Debug.Log("User signed in successfully: " + result.User.DisplayName + " : " + result.User.UserId);
 
-            successPanel.SetActive(true);
+                successPanel.SetActive(true);
+                Invoke(nameof(GoToProfile), 3f);
+            });
+    }
 
-            // This should display the phone number.
-            Debug.Log("Phone number: " + newUser.PhoneNumber);
+    public void SignUp()
+    {
+        if(CheckRegisterInputs() == false) { return; }
 
-            // The phone number providerID is 'phone'.
-            Debug.Log("Phone provider ID: " + newUser.ProviderId);
-        });
+        GameManager.instance.auth.CreateUserWithEmailAndPasswordAsync(email2.text, password2.text).ContinueWith(
+            task =>
+            {
+                if(task.IsCanceled)
+                {
+                    Debug.LogError("Login Cancelled");
+                }
+                if(task.IsFaulted)
+                {
+                    Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                    return;
+                }
+
+                AuthResult result = task.Result;
+                Debug.LogFormat("User Created {0} : {1}", result.User.DisplayName, result.User.UserId);
+
+                successPanel.SetActive(true);
+                Invoke(nameof(GoToProfile), 3f);
+            });
     }
 
     public void GoToHome()
     {
-        SceneManager.LoadScene("Main Menu");
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+    }
+
+    public void GoToProfile()
+    {
+        SceneManager.LoadScene("Profile", LoadSceneMode.Single);
     }
 
     public void Clear()
     {
-        SceneManager.LoadScene("Authentication");
+        SceneManager.LoadScene("Auth");
     }
 
-    string FormatPhoneNumber(string str)
+    public void ClearFeedback()
     {
-        string phone = "+234";
-
-        for (int i = 1; i < str.Length; i++)
-        {
-            phone += str[i];
-        }
-
-        return phone;
+        feedback.text = "";
     }
+
 }

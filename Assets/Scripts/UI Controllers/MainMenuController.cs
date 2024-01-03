@@ -72,7 +72,7 @@ public class MainMenuController : MonoBehaviour
 
     public void GoToProfile()
     {
-        SceneManager.LoadScene("Profile", LoadSceneMode.Single);
+        SceneManager.LoadScene("Auth", LoadSceneMode.Single);
     }
 
     public void GoToPost()

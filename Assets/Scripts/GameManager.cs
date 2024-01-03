@@ -60,9 +60,11 @@ public class GameManager : MonoBehaviour
     {
         //FirebaseAppCheck.SetAppCheckProviderFactory(PlayIntegrityProviderFactory.Instance);
 
-        auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        auth = FirebaseAuth.DefaultInstance;
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
+
+        user = new FirebaseUser();
 
         dbReference = FirebaseDatabase.DefaultInstance.RootReference; //Initialize Database Reference
         stReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl("gs://mumble-ccd73.appspot.com"); //Initialize Storage Reference
@@ -117,18 +119,19 @@ public class GameManager : MonoBehaviour
         });
     }
 
-
-    #region Game Image
-    public void UpdateGameImage(Image _image)
+    bool CheckUserProfile()
     {
-        gameImage = _image;
-        mumbleTex.mainTexture = _image.mainTexture;
-    }
+        user = auth.CurrentUser;
+        if (user != null)
+        {
+            Debug.Log(user.DisplayName + " : " + user.PhoneNumber);
+            //TODO: Load profile details from here
 
-    public void ClearGameImage()
-    {
-        gameImage = null;
-        mumbleTex.mainTexture = null;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
-    #endregion
 }

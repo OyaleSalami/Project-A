@@ -1,6 +1,5 @@
 using Firebase.Database;
 using Firebase.Extensions;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,15 +7,9 @@ using UnityEngine.UI;
 public class ProfileManager : MonoBehaviour
 {
     [Header("Profile Details")]
-    [SerializeField] Text playerName;
-    [SerializeField] Text playerNumber;
     [SerializeField] Text points;
-    [SerializeField] Text gamesWon;
-    [SerializeField] Text gamesPlayed;
-    [SerializeField] Text playerUploaded;
-
-    Dictionary<string, object> playerProfObj;
-    Mumble.PlayerProfile playerProfile;
+    [SerializeField] Text displayName;
+    [SerializeField] Text postsUploaded;
 
     void Start()
     {
@@ -30,29 +23,6 @@ public class ProfileManager : MonoBehaviour
             //TODO: Throw an error
         }
     }
-
-    /* Check the player profile
-    bool CheckUserProfile()
-    {
-        user = auth.CurrentUser;
-        if (user != null)
-        {
-            Debug.Log(user.DisplayName + " : " + user.PhoneNumber);
-            //TODO: Load profile details from here
-
-            return true;
-        }
-        else
-        {
-            Debug.Log("Invalid User!");
-            //Goto Login
-            infoDisplay.DisplayError("You have to sign in first", 3f);
-            Invoke(nameof(GoToLogin), 5f);
-
-            return false;
-        }
-    }
-    */
 
     void GetPlayerDetails()
     {
@@ -69,30 +39,17 @@ public class ProfileManager : MonoBehaviour
                     DataSnapshot snapshot = task.Result;
 
                     // Do something with snapshot...
-                    playerProfObj = new Dictionary<string, object>();
-                    playerProfObj = (Dictionary<string, object>)snapshot.Value;
-
-                    playerProfile = new Mumble.PlayerProfile(playerProfObj);
-                    UpdateUI();
                 }
             });
     }
 
-    public void Exit()
-    {
-        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
-    }
-
-    public void GoToLogin()
-    {
-        SceneManager.LoadScene("Authentication", LoadSceneMode.Single);
-    }
-
     public void UpdateUI()
     {
-        if (playerProfile == null)
-        {
-            return; //Exit if there is no valid player data
-        }
+        //Set the display name of the user
+        displayName.text = GameManager.instance.user.DisplayName;
+    }
+    public void Exit()
+    {
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
     }
 }
