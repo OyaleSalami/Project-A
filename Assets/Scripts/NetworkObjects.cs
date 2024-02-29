@@ -7,29 +7,27 @@ namespace Mumble
 {
     [System.Serializable] public class Comment
     {
-        public string username;
+        /// <summary>The Display Name Of The Poster</summary>
+        public string displayName;
+
+        /// <summary>The Comment Made By The Poster</summary>
         public string comment;
-        public int likes;
+
+        /// <summary>The Number Of Likes On The Comment</summary>
+        public int likesCount;
 
         public Comment()
         {
-
-        }
-
-        public Comment(string _comment, string _username, int _likes)
-        {
-            username = _username;
-            comment = _comment;
-            likes = _likes;
+            likesCount = 0;
         }
 
         public Comment(Dictionary<string, object> _comment)
         {
             try
             {
-                username = _comment["username"].ToString();
-                comment = _comment["comment"].ToString();
-                likes = int.Parse(_comment["likes"].ToString());
+                displayName = _comment["displayName"].ToString();
+                comment     = _comment["comment"].ToString();
+                likesCount  = int.Parse(_comment["likesCount"].ToString());
             }
             catch(Exception e)
             {
@@ -37,6 +35,7 @@ namespace Mumble
             }
         }
 
+        /// <summary>Returns This Object As A Json String</summary>
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
@@ -45,36 +44,52 @@ namespace Mumble
 
     [System.Serializable] public class Post
     {
-        public int seen; //No of times the post was seen
-        public int likes; //No of likes per post
-        public int comments; //No of comments
-        public int saves; //No of saves
-        public string postId; //Post ID (Identifies post and comment sections)
-        public string description; //Description of the post
-        public string username; //Username of the person that posted it
+        /// <summary>The Unique ID For This Post (Identifies post and comment sections)</summary>
+        public string postId;
+        
+        /// <summary>User ID Of The Poster</summary>
+        public string userId;
 
-        //Creating a blank post object
+        /// <summary>The Display Name Of The USer</summary>
+        public string displayName;
+
+        /// <summary>The Description Of The Post</summary>
+        public string description;
+
+        /// <summary>View Count</summary>
+        public int viewCount;
+
+        /// <summary>Likes Count</summary>
+        public int likesCount;
+
+        /// <summary>Comment Count</summary>
+        public int commentsCount;
+
+        /// <summary>Save Count</summary>
+        public int savesCount;
+
+
         public Post()
         {
-            seen = 0;
-            likes = 0;
-            comments = 0;
-            saves = 0;
-            //TODO: username = GameManager.instance.user.DisplayName; 
+            viewCount     = 0;
+            likesCount    = 0;
+            commentsCount = 0;
+            savesCount    = 0;
         }
 
-        //Re-Create a post object from a dictionary
         public Post(Dictionary<string, object> _post)
         {
             try
             {
-                seen = int.Parse(_post["posts"].ToString());
-                likes = int.Parse(_post["likes"].ToString());
-                comments = int.Parse(_post["comments"].ToString());
-                saves = int.Parse(_post["saves"].ToString());
-                postId = _post["postId"].ToString();
+                postId      = _post["postId"].ToString();
+                userId      = _post["userId"].ToString();
+                displayName = _post["displayName"].ToString();
                 description = _post["description"].ToString();
-                username = _post["username"].ToString();
+
+                viewCount     = int.Parse(_post["viewCount"].ToString());
+                likesCount    = int.Parse(_post["likesCount"].ToString());
+                savesCount    = int.Parse(_post["savesCount"].ToString());
+                commentsCount = int.Parse(_post["commentsCount"].ToString());
             }
             catch (Exception e)
             {
@@ -82,44 +97,31 @@ namespace Mumble
             }
         }
 
-        //Create a post object from a Json file/string
-        public Post(string json)
-        {
-            try
-            {
-                Dictionary<string, object> _post = (Dictionary<string, object>)JsonConvert.DeserializeObject(json);
-            }
-            catch(Exception e)
-            {
-                Debug.Log("Error Creating Post: " + e);
-            }
-        }
-
-        //Return the object as a Json string
+        /// <summary>Returns the object as a JSon string</summary>
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this);
         }
     }
 
-    [System.Serializable] [System.Obsolete]
-    public class Event
+    [System.Serializable] public class User
     {
-        public Event()
-        {
+        /// <summary>The User's Unique Id</summary>
+        public string userId;
 
-        }
+        ///<summary> User's Display Name </summary>
+        public string displayName; 
 
-        public Event(Dictionary<string, object> dict)
+        /// <summary>Number Of Posts Made By The User</summary>
+        public int postCount;
+
+        public User(Dictionary<string, object> user)
         {
             try
             {
-                title = dict["title"].ToString();
-                event_id = dict["event_id"].ToString();
-                description = dict["description"].ToString();
-                countdown_time = int.Parse(dict["countdown_time"].ToString());
-                times_played = int.Parse(dict["times_played"].ToString());
-                times_won = int.Parse(dict["times_won"].ToString());
+                userId      = user["userId"].ToString();
+                displayName = user["displayName"].ToString();
+                postCount   = int.Parse(user["postCount"].ToString());
             }
             catch (Exception e)
             {
@@ -127,60 +129,11 @@ namespace Mumble
             }
         }
 
-        /// <summary>The title of the game event</summary>
-        public string title { get; set; }
-        /// <summary>The Id for that event</summary>
-        public string event_id { get; set; }
-        /// <summary>The description of the event</summary>
-        public string description { get; set; }
-        /// <summary>The timer for the event</summary>
-        public int countdown_time { get; set; }
-        /// <summary>The no of times played</summary>
-        public int times_played { get; }
-        /// <summary>The no of times won</summary>
-        public int times_won { get; }
-    }
-
-    [System.Serializable] public class PlayerProfile
-    {
-        public string username; //Player Username
-        public string phonenumber; //Player's phonenumber
-        public int postcount; //No of posts by the player
-        public int points; //Points the player has
-        public int gamesplayed; //No of games the player has played
-        public int gameswon; //No of games the player has won
-
-        public string[] posts; //List of posts uploaded by the player (their IDs)
-        public string[] saved; //List of posts saved by the player (their IDs)
-        public string[] liked; //List of posts like by the player (their IDs)
-
-        public PlayerProfile(Dictionary<string, object> prof)
+        /// <summary>Returns the object as a JSon string</summary>
+        public string ToJson()
         {
-            try
-            {
-                username = prof["name"].ToString();
-                phonenumber = prof["phonenumber"].ToString();
-                postcount = int.Parse(prof["postcount"].ToString());
-                points = int.Parse(prof["points"].ToString());
-                gamesplayed = int.Parse(prof["games_played"].ToString());
-                gameswon = int.Parse(prof["games_won"].ToString());
-
-                /*
-                 * TODO: Get the lists for the other details
-                 * posts = 
-                 * saved = 
-                 * liked = 
-                */
-            }
-            catch (Exception e)
-            {
-                Debug.Log("Invalid dictionary: " + e);
-            }
-        }
-
-        [System.Obsolete] public PlayerProfile(string json)
-        {
-            JsonConvert.DeserializeObject(json);
+            return JsonConvert.SerializeObject(this);
         }
     }
+
 }

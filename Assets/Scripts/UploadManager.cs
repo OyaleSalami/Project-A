@@ -2,6 +2,7 @@ using Firebase.Extensions;
 using Firebase.Storage;
 using Mumble;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,14 +22,12 @@ public class UploadManager : MonoBehaviour
 
     void Start()
     {
-        //Check if firebase is initialiazed
-        if (GameManager.instance.isFirebaseReady)
+        if (GameManager.instance.isFirebaseReady == false) //Check if firebase is initialiazed
         {
-            //Good to go
-        }
-        else
-        {
-            //Throw error
+            if (GameManager.instance.Initialize() != true) //Try to initialize it
+            {
+                throw new Exception("Unable to initialize the Game Manager");
+            }
         }
     }
 
@@ -113,6 +112,8 @@ public class UploadManager : MonoBehaviour
         {
             description = descInput.text,
             postId = key,
+            userId = GameManager.instance.user.UserId,
+            displayName = GameManager.instance.user.DisplayName
         };
 
         //Convert the object to a Json string
@@ -126,16 +127,18 @@ public class UploadManager : MonoBehaviour
             }
             else
             {
-                //Add event to active list of events (Only if the event uploaded successfully)
+                //Add event to active list of events
                 GameManager.instance.dbReference.Child("post_list").Push().SetValueAsync(key);
+
+                //Add event to users list of events
+                GameManager.instance.dbReference.Child("users").Child(_temp.userId).Child("posts").Push().SetValueAsync(key);
+
             }
         }
         );
 
         //Upload Image
         UploadImageToBucket(key);
-
-        //TODO: Add post to the user's profile(db)
     }
 
     void UploadImageToBucket(string id)
@@ -166,4 +169,5 @@ public class UploadManager : MonoBehaviour
     {
         NativeFilePicker.Permission permission = await NativeFilePicker.RequestPermissionAsync(readPermissionOnly);
     }
+
 }

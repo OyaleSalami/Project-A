@@ -17,7 +17,8 @@ public class EventLine : MonoBehaviour
     public void AddEvent(string _id)
     {
         eventDisplays[index].SetActive(true);
-        eventDisplays[index].GetComponent<PostObject>().LoadEvent(_id);
+        eventDisplays[index].GetComponent<PostObject>().postId = _id;
+        eventDisplays[index].GetComponent<PostObject>().LoadPost();
         index++;
     }
 }

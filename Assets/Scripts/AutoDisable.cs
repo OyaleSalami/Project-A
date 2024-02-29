@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AutoDisable : MonoBehaviour
@@ -16,7 +14,7 @@ public class AutoDisable : MonoBehaviour
     {
         curr_time += Time.deltaTime;
 
-        if(curr_time >= timer)
+        if (curr_time >= timer)
         {
             Disable();
         }

@@ -30,9 +30,9 @@ public class DatabaseManager : MonoBehaviour
         storageReference = storage.GetReferenceFromUrl("gs://mumble-ccd73.appspot.com");
     }
 
-    public static void UploadEvent(ref Mumble.Event _event, byte[] imageData)
+    public static void UploadEvent(ref Mumble.Post _event, byte[] imageData)
     {
-        _event.event_id = DateTime.Now.ToUniversalTime().ToString();
+        _event.postId = DateTime.Now.ToUniversalTime().ToString();
 
         string json = JsonUtility.ToJson(_event);
 
@@ -51,7 +51,7 @@ public class DatabaseManager : MonoBehaviour
         };
 
         //Create a reference to where the file needs to be uploaded
-        StorageReference uploadRef = storageReference.Child(_event.event_id + ".jpeg");
+        StorageReference uploadRef = storageReference.Child(_event.postId + ".jpeg");
 
         uploadRef.PutBytesAsync(imageData, newMetaData).ContinueWithOnMainThread(task =>
         {
