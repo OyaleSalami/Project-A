@@ -94,16 +94,16 @@ public class GameManager : MonoBehaviour
 
             if (!signedIn && user != null)
             {
-                SceneManager.LoadScene("Auth", LoadSceneMode.Single);
-                Debug.Log("Signed Out: " + user.UserId);
+                Debug.Log("Signed Out");
+                LoadScript.LoadScene(1, "Auth");
             }
 
             user = auth.CurrentUser;
 
             if (signedIn)
             {
-                SceneManager.LoadScene("Main", LoadSceneMode.Single);
-                Debug.Log("Signed In: " + user.UserId);
+                Debug.Log("Signed In");
+                LoadScript.LoadScene(1, "Main");
             }
         }
     }

@@ -33,7 +33,7 @@ public class PostObject : MonoBehaviour
 
     void Start()
     {
-        //\\commentPanel = GameObject.FindGameObjectWithTag("comments");
+        //commentPanel = GameObject.FindGameObjectWithTag("comments");
 
         //Load The Event If There Is A Given Post ID
         if(!string.IsNullOrEmpty(postId))
