@@ -19,7 +19,7 @@ public class PostObject : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] Image displayImage;
-    [SerializeField] GameObject errorPanel;
+    [SerializeField] GameObject commentPanel;
 
     [Space(20)]
     [Header("Post UI")]
@@ -33,7 +33,7 @@ public class PostObject : MonoBehaviour
 
     void Start()
     {
-        //commentPanel = GameObject.FindGameObjectWithTag("comments");
+        commentPanel = GameObject.FindGameObjectWithTag("comments");
 
         //Load The Event If There Is A Given Post ID
         if(!string.IsNullOrEmpty(postId))
@@ -59,7 +59,6 @@ public class PostObject : MonoBehaviour
             if (task.IsFaulted)
             {
                 Debug.LogError(task.Exception);
-                errorPanel.SetActive(true);
             }
             else if (task.IsCompleted)
             {

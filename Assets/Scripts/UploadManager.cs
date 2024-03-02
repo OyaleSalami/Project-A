@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UploadManager : MonoBehaviour
@@ -31,13 +30,16 @@ public class UploadManager : MonoBehaviour
         }
     }
 
+    /// <summary>Goes back to the main scene</summary>
     public void GoToHome()
     {
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        LoadScript.LoadScene(1f, "Main");
     }
 
+    /// <summary>Brings up the context window to allow selecting a file</summary>
     public void SelectFile()
     {
+        //Define the extension types
         string pngType = NativeFilePicker.ConvertExtensionToFileType("png");
         string jpgType = NativeFilePicker.ConvertExtensionToFileType("jpg");
 
@@ -47,6 +49,7 @@ public class UploadManager : MonoBehaviour
         NativeFilePicker.PickFile(CheckImage, pngType, jpgType);
     }
 
+    /// <summary>Checks if the image is valid</summary>
     private void CheckImage(string path)
     {
         if (path == null) //No Image was picked
@@ -61,9 +64,8 @@ public class UploadManager : MonoBehaviour
             //Try converting the bytes to a texture
             if (ImageConversion.LoadImage(texture, imageData) != true)
             {
-                //Invalid Image
-                imageData = null; //Clear the image data that was loaded
-                return;
+                //Invalid Image //Clear the image data that was loaded
+                imageData = null; return;
             }
             else
             {
@@ -82,6 +84,7 @@ public class UploadManager : MonoBehaviour
         }
     }
 
+    /// <summary>Set's the Image display to the selected image</summary>
     private void UpdateDisplayImage()
     {
         imagePlaceholder.SetActive(false); //Disable Placeholders
@@ -165,9 +168,9 @@ public class UploadManager : MonoBehaviour
         );
     }
 
+    /// <summary>Request permission to read a file on mobile</summary>
     private async void RequestPermissionAsynchronously(bool readPermissionOnly = false)
     {
         NativeFilePicker.Permission permission = await NativeFilePicker.RequestPermissionAsync(readPermissionOnly);
     }
-
 }

@@ -1,11 +1,12 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Newtonsoft.Json;
 
 namespace Mumble
 {
-    [System.Serializable] public class Comment
+    [System.Serializable]
+    public class Comment
     {
         /// <summary>The Display Name Of The Poster</summary>
         public string displayName;
@@ -15,6 +16,9 @@ namespace Mumble
 
         /// <summary>The Number Of Likes On The Comment</summary>
         public int likesCount;
+
+        /// <summary>The User's unique ID</summary>
+        public string userId;
 
         public Comment()
         {
@@ -26,10 +30,11 @@ namespace Mumble
             try
             {
                 displayName = _comment["displayName"].ToString();
-                comment     = _comment["comment"].ToString();
-                likesCount  = int.Parse(_comment["likesCount"].ToString());
+                userId = _comment["userId"].ToString();
+                comment = _comment["comment"].ToString();
+                likesCount = int.Parse(_comment["likesCount"].ToString());
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.Log("Error creating comment: " + e);
             }
@@ -42,11 +47,12 @@ namespace Mumble
         }
     }
 
-    [System.Serializable] public class Post
+    [System.Serializable]
+    public class Post
     {
         /// <summary>The Unique ID For This Post (Identifies post and comment sections)</summary>
         public string postId;
-        
+
         /// <summary>User ID Of The Poster</summary>
         public string userId;
 
@@ -71,24 +77,24 @@ namespace Mumble
 
         public Post()
         {
-            viewCount     = 0;
-            likesCount    = 0;
+            viewCount = 0;
+            likesCount = 0;
             commentsCount = 0;
-            savesCount    = 0;
+            savesCount = 0;
         }
 
         public Post(Dictionary<string, object> _post)
         {
             try
             {
-                postId      = _post["postId"].ToString();
-                userId      = _post["userId"].ToString();
+                postId = _post["postId"].ToString();
+                userId = _post["userId"].ToString();
                 displayName = _post["displayName"].ToString();
                 description = _post["description"].ToString();
 
-                viewCount     = int.Parse(_post["viewCount"].ToString());
-                likesCount    = int.Parse(_post["likesCount"].ToString());
-                savesCount    = int.Parse(_post["savesCount"].ToString());
+                viewCount = int.Parse(_post["viewCount"].ToString());
+                likesCount = int.Parse(_post["likesCount"].ToString());
+                savesCount = int.Parse(_post["savesCount"].ToString());
                 commentsCount = int.Parse(_post["commentsCount"].ToString());
             }
             catch (Exception e)
@@ -104,13 +110,11 @@ namespace Mumble
         }
     }
 
-    [System.Serializable] public class User
+    [System.Serializable]
+    public class User
     {
         /// <summary>The User's Unique Id</summary>
         public string userId;
-
-        ///<summary> User's Display Name </summary>
-        public string displayName; 
 
         /// <summary>Number Of Posts Made By The User</summary>
         public int postCount;
@@ -119,9 +123,8 @@ namespace Mumble
         {
             try
             {
-                userId      = user["userId"].ToString();
-                displayName = user["displayName"].ToString();
-                postCount   = int.Parse(user["postCount"].ToString());
+                userId = user["userId"].ToString();
+                postCount = int.Parse(user["postCount"].ToString());
             }
             catch (Exception e)
             {

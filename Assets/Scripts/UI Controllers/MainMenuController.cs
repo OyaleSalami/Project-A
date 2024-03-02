@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -13,12 +12,12 @@ public class MainMenuController : MonoBehaviour
 
     public void GoToSettings()
     {
-        SceneManager.LoadScene("Settings", LoadSceneMode.Single);
+        LoadScript.LoadScene(1f, "Settings");
     }
 
     public void GoToMain()
     {
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        LoadScript.LoadScene(1f, "Main");
     }
 
     public void ExitApp()
@@ -28,11 +27,11 @@ public class MainMenuController : MonoBehaviour
 
     public void GoToProfile()
     {
-        SceneManager.LoadScene("Profile", LoadSceneMode.Single);
+        LoadScript.LoadScene(1f, "Profile");
     }
 
     public void GoToPost()
     {
-        SceneManager.LoadScene("Post", LoadSceneMode.Single);
+        LoadScript.LoadScene(1f, "Post");
     }
 }

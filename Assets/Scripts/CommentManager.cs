@@ -3,6 +3,7 @@ using Mumble;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CommentManager : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class CommentManager : MonoBehaviour
     public string postId;
 
     /// <summary>List Of The Comment IDs For This Post</summary>
-    public List<string> comments;
+    private List<string> comments;
 
     [Header("UI")]
     [SerializeField] GameObject commentAnchor;
@@ -19,6 +20,10 @@ public class CommentManager : MonoBehaviour
     [SerializeField] RectTransform scrollViewContentHolder;
     [SerializeField] List<GameObject> commentObjects; //Reference to the comment objects
 
+
+    [Header("Comment Submission")]
+    [SerializeField] InputField commentInput;
+
     void Update()
     {
         //TODO: Change the button mapping to register the back button
@@ -26,6 +31,16 @@ public class CommentManager : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Deactivate()
+    {
+        gameObject.SetActive(false);
     }
 
     public void LoadAllComments()
@@ -49,21 +64,24 @@ public class CommentManager : MonoBehaviour
         temp.GetComponent<CommentObject>().commentId = id;
         temp.GetComponent<CommentObject>().LoadComment();
     }
-
-    //Add a comment to a post
-    public void AddNewComment(string _comment)
+    
+    /// <summary>Creates a new comment under a particular post</summary>
+    public void SubmitComment()
     {
-        //Create a temporary object to store the comment
-        Comment temp = new()
+        //Generate the comment ID
+        string key = GameManager.instance.dbReference.Child("comments").Child(postId).Push().Key;
+
+        //Creating a temporary comment object
+        Comment _comment = new Comment
         {
-            comment = _comment,
-            displayName = GameManager.instance.user.DisplayName,
-            likesCount = 0
+            comment = commentInput.text,
+            likesCount = 0,
+            userId = GameManager.instance.user.UserId,
+            displayName = GameManager.instance.user.DisplayName
         };
 
-        //Create And Get the unique ID for the new comment
-        string key = GameManager.instance.dbReference.Child("comments").Child(postId).Push().Key;
-        string output = temp.ToJson();
+        //Convert the object to a Json string
+        string output = _comment.ToJson();
 
         GameManager.instance.dbReference.Child("comments").Child(postId).Child(key).SetRawJsonValueAsync(output).ContinueWithOnMainThread(task =>
         {
@@ -73,10 +91,12 @@ public class CommentManager : MonoBehaviour
             }
             else
             {
-                //Add event to active list of events (Only if the event uploaded successfully)
-                GameManager.instance.dbReference.Child("posts").Child(postId).Child("comment_list").Push().SetValueAsync(key);
+                //Add comment to active list of comments under a particular post
+                GameManager.instance.dbReference.Child("comments_list").Child(postId).Push().SetValueAsync(key);
             }
         }
         );
+
+        commentInput.text = "";
     }
 }
