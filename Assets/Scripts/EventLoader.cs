@@ -23,6 +23,7 @@ public class EventLoader : MonoBehaviour
         //Add 3 events at a time
         for (int i = 0; i < 3; i++)
         {
+            /* Redo This Code
             if(eventIndex > GameManager.instance.events.Count)
             {
                 break;
@@ -32,6 +33,7 @@ public class EventLoader : MonoBehaviour
                 AddEvent(GameManager.instance.events[eventIndex + i]);
                 eventIndex += 1;
             }
+            */
         }
     }
 
@@ -51,6 +53,7 @@ public class EventLoader : MonoBehaviour
         scrollViewContentHolder.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scrollViewContentHolder.rect.height + newHeight);
         
         prevPost = temp;
-        temp.GetComponent<PostObject>().LoadEvent(id);
+        temp.GetComponent<PostObject>().postId = id;
+        temp.GetComponent<PostObject>().LoadPost();
     }
 }

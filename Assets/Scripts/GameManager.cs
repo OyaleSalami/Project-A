@@ -4,25 +4,30 @@ using Firebase.Extensions;
 using Firebase.Storage;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] Material mumbleTex; //Prefab for the image for the game board
+    /// <summary> Singleton instance of the game manager</summary>
+    public static GameManager instance;
 
-    public static GameManager instance; //Singleton instance of the game manager class
-    public InfoDisplay infoDisplay; //This sits on the game manager object
-
+    /// <summary>Describes if Firebase is in a useable state</summary>
     public bool isFirebaseReady = false;
-    public FirebaseAuth auth; //Authentication Details about the player
-    public FirebaseUser user; //The Signed-in User
-    public StorageReference stReference; //Reference to the storage bucket
-    public DatabaseReference dbReference; //Reference to the the database 
+
+    /// <summary> Authentication Details about the player </summary>
+    public FirebaseAuth auth;
+
+    /// <summary> The Signed-in User </summary>
+    public FirebaseUser user;
+
+    /// <summary> Reference to the storage bucket </summary>
+    public StorageReference stReference;
+
+    /// <summary> Reference to the the database </summary>
+    public DatabaseReference dbReference; //
 
 
-    public List<string> events; //List of the event IDs
-
-    private Image gameImage;
+    //public List<string> events; //List of the event IDs
 
     void Awake()
     {
@@ -39,7 +44,11 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        infoDisplay = GetComponent<InfoDisplay>();
+        Initialize();
+    }
+
+    public bool Initialize()
+    {
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             var dependencyStatus = task.Result;
@@ -54,41 +63,55 @@ public class GameManager : MonoBehaviour
                 Debug.LogError(string.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus.ToString()));
             }
         });
+
+        return true;
     }
 
     void InitializeFirebase()
     {
+        //TODO: Set up App Check
         //FirebaseAppCheck.SetAppCheckProviderFactory(PlayIntegrityProviderFactory.Instance);
+        user = new FirebaseUser();
 
         auth = FirebaseAuth.DefaultInstance;
         auth.StateChanged += AuthStateChanged;
         AuthStateChanged(this, null);
 
-        user = new FirebaseUser();
 
-        dbReference = FirebaseDatabase.DefaultInstance.RootReference; //Initialize Database Reference
-        stReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl("gs://mumble-ccd73.appspot.com"); //Initialize Storage Reference
+        //Initialize Database Reference
+        dbReference = FirebaseDatabase.DefaultInstance.RootReference;
+
+        //Initialize Storage Reference
+        stReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl("gs://mumble-ccd73.appspot.com");
     }
 
-    void AuthStateChanged(object sender, System.EventArgs eventArgs) // Track state changes of the auth object.
+    /// <summary> Tracks state changes of the auth object </summary>
+    public void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
         if (auth.CurrentUser != user)
         {
-            bool signedIn = user != auth.CurrentUser && auth.CurrentUser != null;
+            bool signedIn = (user != auth.CurrentUser && auth.CurrentUser != null);
+
             if (!signedIn && user != null)
             {
-                infoDisplay.DisplayMessage("Signed out: " + user.UserId);
+                Debug.Log("Signed Out");
+                LoadScript.LoadScene(1, "Auth");
             }
+
             user = auth.CurrentUser;
+
             if (signedIn)
             {
-                infoDisplay.DisplayMessage("Signed in: " + user.UserId);
+                Debug.Log("Signed In");
+                LoadScript.LoadScene(1, "Main");
             }
         }
     }
 
-    // Handle removing subscription and reference to the Auth instance.
-    // Automatically called by a Monobehaviour after Destroy is called on it.
+    /// <summary>
+    /// Handle removing subscription and reference to the Auth instance.
+    /// Automatically called by a Monobehaviour after Destroy is called on it.
+    /// </summary>
     void OnDestroy()
     {
         auth.StateChanged -= AuthStateChanged;
@@ -113,25 +136,9 @@ public class GameManager : MonoBehaviour
 
                 foreach (string s in valCol)
                 {
-                    events.Add(s);
+                    //events.Add(s);
                 }
             }
         });
-    }
-
-    bool CheckUserProfile()
-    {
-        user = auth.CurrentUser;
-        if (user != null)
-        {
-            Debug.Log(user.DisplayName + " : " + user.PhoneNumber);
-            //TODO: Load profile details from here
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 }

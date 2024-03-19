@@ -9,97 +9,94 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-
 public class PostObject : MonoBehaviour
 {
-    public string id; //The post id
-    public Post thisPost; //The description for this post
+    /// <summary>Unique ID Of This Post</summary>
+    public string postId;
+
+    /// <summary>The Post Descriptor</summary>
+    public Post post;
 
     [Header("UI")]
-    [SerializeField] Image image; //Reference to the image display
-    [SerializeField] GameObject clickButton;
-    [SerializeField] GameObject reloadButton;
+    [SerializeField] Image displayImage;
     [SerializeField] GameObject commentPanel;
 
-    [Space(20)][Header("Post UI")]
-    [SerializeField] Text username;
-    [SerializeField] Text seenNumber;
-    [SerializeField] Text likesNumber;
-    [SerializeField] Text commentsNumber;
-    [SerializeField] Text savesNumber;
+    [Header("Post UI")]
+    [SerializeField] Text displayName;
+    [SerializeField] Text viewCount;
+    //[SerializeField] Text savesCount;
+    [SerializeField] Text likesCount;
+    [SerializeField] Text commentsCount;
 
-    [SerializeField] GameObject likeImageFull;
-    [SerializeField] GameObject savedImageFull;
-    [SerializeField] GameObject commentImageFull;
+    [Header("Animations")]
+    [SerializeField] Animation likeAnimation;
 
-    bool loaded = false;
+    private bool loaded = false;
 
     void Start()
     {
         commentPanel = GameObject.FindGameObjectWithTag("comments");
-    }
 
-    public void UpdateDisplay()
-    {
-        if (loaded == true)
+        //Load The Event If There Is A Given Post ID
+        if (!string.IsNullOrEmpty(postId))
         {
-            seenNumber.text = thisPost.seen.ToString();
-            likesNumber.text = thisPost.likes.ToString();
-            savesNumber.text = thisPost.saves.ToString();
-            commentsNumber.text = thisPost.comments.ToString();
-            username.text = "   @" + thisPost.username.ToString();
-
-            //TODO: Check if the user has liked, saved or commented on the post
-            /*
-            if(liked == true)
-            {
-                likeImageFull.setActive(true);
-            }
-
-            if(comment == true)
-            {
-                savedImageFull.setActive(true);
-            }
-
-            if(saved == true)
-            {
-                commentImageFull.setActive(true);
-            }
-            */
+            LoadPost();
         }
+
+        //Setup Event Listeners
+        FirebaseDatabase.DefaultInstance.GetReference("posts").Child(postId).ValueChanged += HandleValueChanged;
     }
 
-    public void LoadEvent(string _id)
+    private void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
-        id = _id;
-        //Load the post from the database
-        GameManager.instance.dbReference.Child("posts").Child(_id).GetValueAsync()
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsFaulted)
-                {
-                    Debug.LogError(task.Exception);
-                    reloadButton.SetActive(true);
-                    clickButton.SetActive(false);
-                }
-                else if (task.IsCompleted)
-                {
-                    DataSnapshot snapshot = task.Result;
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
 
-                    // Do something with snapshot...
-                    Dictionary<string, object> dict = (Dictionary<string, object>)snapshot.Value;
+        // Do something with the data in args.Snapshot
+        Dictionary<string, object> dict = (Dictionary<string, object>)args.Snapshot.Value;
 
-                    thisPost = new Post(dict);
-                    LoadImage();
-                }
-            });
+        post = new Post(dict);
+        UpdateUI();
     }
 
-    //Download image from firebase to display
+    public void UpdateUI()
+    {
+        viewCount.text = TransformCount(post.viewCount);
+        likesCount.text = TransformCount(post.likesCount);
+        //savesCount.text = TransformCount(post.savesCount);
+        commentsCount.text = TransformCount(post.commentsCount);
+        displayName.text = "  @" + post.displayName.ToString();
+    }
+
+    public void LoadPost()
+    {
+        //Load the post from the database
+        GameManager.instance.dbReference.Child("posts").Child(postId).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.LogError(task.Exception);
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+
+                // Do something with snapshot...
+                Dictionary<string, object> dict = (Dictionary<string, object>)snapshot.Value;
+
+                post = new Post(dict);
+                LoadImage();
+            }
+        });
+    }
+
     void LoadImage()
     {
         //Get image reference
-        StorageReference imageReference = GameManager.instance.stReference.Child("uploads/" + id + ".jpeg");
+        StorageReference imageReference = GameManager.instance.stReference.Child("uploads/" + postId + ".jpeg");
 
         //Get the download link for file
         imageReference.GetDownloadUrlAsync().ContinueWithOnMainThread(task =>
@@ -111,8 +108,6 @@ public class PostObject : MonoBehaviour
             else
             {
                 Debug.Log("Error downloading image!" + task.Exception);
-                reloadButton.SetActive(true);
-                clickButton.SetActive(false);
             }
         }
         );
@@ -126,22 +121,19 @@ public class PostObject : MonoBehaviour
         if (request.isHttpError || request.isNetworkError)
         {
             Debug.Log("Error Downloading the Image!");
-            reloadButton.SetActive(true);
-            clickButton.SetActive(false);
         }
         else
         {
             loaded = true;
-            reloadButton.SetActive(false);
-            clickButton.SetActive(true);
+            displayImage.color = Color.white;
 
-            image.color = Color.white;
             //image.texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
 
             //TODO: Resize image here
             Texture2D text = ((DownloadHandlerTexture)request.downloadHandler).texture;
-            image.sprite = Sprite.Create(text, new Rect(Vector2.zero, new Vector2(text.width, text.height)),
+            displayImage.sprite = Sprite.Create(text, new Rect(Vector2.zero, new Vector2(text.width, text.height)),
                             Vector2.zero);
+            displayImage.preserveAspect = true;
         }
     }
 
@@ -149,20 +141,65 @@ public class PostObject : MonoBehaviour
     {
         //TODO: Check the comments section
         commentPanel.SetActive(true);
-    }
-
-    public void CheckSaved()
-    {
-        //TODO: Check the saved events
+        commentPanel.GetComponent<CommentManager>().postId = postId;
+        commentPanel.GetComponent<CommentManager>().Activate();
     }
 
     public void LikePost()
     {
-        //TODO: Like the post
+        IncreaseLikeCounter();
+        likeAnimation.Play();
+        UpdateUI();
     }
 
-    public void SavePost()
+    public void IncreaseLikeCounter()
     {
-        //TODO: Save the post to the user profile
+        GameManager.instance.dbReference.Child("posts").Child(postId).Child("likesCount").RunTransaction(task =>
+        {
+            int currentLikes = (int)task.Value; // Get current value
+            task.Value = currentLikes + 1; // Set the new value (current + 1)
+            return TransactionResult.Success(task);
+        });
+    }
+
+    public void IncreaseSavedCounter()
+    {
+        GameManager.instance.dbReference.Child("posts").Child(postId).Child("savesCount").RunTransaction(task =>
+        {
+            int currentSaves = (int)task.Value; // Get current value
+            task.Value = currentSaves + 1; // Set the new value (current + 1)
+            return TransactionResult.Success(task);
+        });
+    }
+
+    public void IncreaseViewCounter()
+    {
+        GameManager.instance.dbReference.Child("posts").Child(postId).Child("viewCount").RunTransaction(task =>
+        {
+            int currentViews = (int)task.Value; // Get current value
+            task.Value = currentViews + 1; // Set the new value (current + 1)
+            return TransactionResult.Success(task);
+        });
+    }
+
+    public void SavePost() //TODO: Save the post to the user profile
+    {
+        //Add event to users list of events
+        GameManager.instance.dbReference.Child("users").Child(post.userId).Child("posts").Push().SetValueAsync(postId);
+    }
+
+    string TransformCount(int val)
+    {
+        if (val > 1000)
+        {
+            if (val > 1000000)
+            {
+                return (val / 1000000).ToString() + "m";
+            }
+
+            return (val / 1000).ToString() + "k";
+        }
+
+        return val.ToString();
     }
 }

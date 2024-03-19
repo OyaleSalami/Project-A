@@ -2,9 +2,9 @@ using Firebase.Extensions;
 using Firebase.Storage;
 using Mumble;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UploadManager : MonoBehaviour
@@ -21,24 +21,25 @@ public class UploadManager : MonoBehaviour
 
     void Start()
     {
-        //Check if firebase is initialiazed
-        if (GameManager.instance.isFirebaseReady)
+        if (GameManager.instance.isFirebaseReady == false) //Check if firebase is initialiazed
         {
-            //Good to go
-        }
-        else
-        {
-            //Throw error
+            if (GameManager.instance.Initialize() != true) //Try to initialize it
+            {
+                throw new Exception("Unable to initialize the Game Manager");
+            }
         }
     }
 
+    /// <summary>Goes back to the main scene</summary>
     public void GoToHome()
     {
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        LoadScript.LoadScene(1f, "Main");
     }
 
+    /// <summary>Brings up the context window to allow selecting a file</summary>
     public void SelectFile()
     {
+        //Define the extension types
         string pngType = NativeFilePicker.ConvertExtensionToFileType("png");
         string jpgType = NativeFilePicker.ConvertExtensionToFileType("jpg");
 
@@ -48,6 +49,7 @@ public class UploadManager : MonoBehaviour
         NativeFilePicker.PickFile(CheckImage, pngType, jpgType);
     }
 
+    /// <summary>Checks if the image is valid</summary>
     private void CheckImage(string path)
     {
         if (path == null) //No Image was picked
@@ -62,9 +64,8 @@ public class UploadManager : MonoBehaviour
             //Try converting the bytes to a texture
             if (ImageConversion.LoadImage(texture, imageData) != true)
             {
-                //Invalid Image
-                imageData = null; //Clear the image data that was loaded
-                return;
+                //Invalid Image //Clear the image data that was loaded
+                imageData = null; return;
             }
             else
             {
@@ -83,6 +84,7 @@ public class UploadManager : MonoBehaviour
         }
     }
 
+    /// <summary>Set's the Image display to the selected image</summary>
     private void UpdateDisplayImage()
     {
         imagePlaceholder.SetActive(false); //Disable Placeholders
@@ -113,6 +115,8 @@ public class UploadManager : MonoBehaviour
         {
             description = descInput.text,
             postId = key,
+            userId = GameManager.instance.user.UserId,
+            displayName = GameManager.instance.user.DisplayName
         };
 
         //Convert the object to a Json string
@@ -126,16 +130,17 @@ public class UploadManager : MonoBehaviour
             }
             else
             {
-                //Add event to active list of events (Only if the event uploaded successfully)
+                //Add event to active list of events
                 GameManager.instance.dbReference.Child("post_list").Push().SetValueAsync(key);
+
+                //Add event to users list of events
+                GameManager.instance.dbReference.Child("users").Child(_temp.userId).Child("posts").Push().SetValueAsync(key);
             }
         }
         );
 
         //Upload Image
         UploadImageToBucket(key);
-
-        //TODO: Add post to the user's profile(db)
     }
 
     void UploadImageToBucket(string id)
@@ -162,6 +167,7 @@ public class UploadManager : MonoBehaviour
         );
     }
 
+    /// <summary>Request permission to read a file on mobile</summary>
     private async void RequestPermissionAsynchronously(bool readPermissionOnly = false)
     {
         NativeFilePicker.Permission permission = await NativeFilePicker.RequestPermissionAsync(readPermissionOnly);
