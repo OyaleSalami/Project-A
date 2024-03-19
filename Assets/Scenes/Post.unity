@@ -259,19 +259,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 26e9e8887dd2a7a409755836f130e57e, type: 3}
+    m_Font: {fileID: 12800000, guid: c962441d0c60e474b930efb3fa7ecf45, type: 3}
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 45
+    m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 1
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Upload Image
+  m_Text: Select Photo
 --- !u!222 &153066522
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1041,7 +1041,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 26e9e8887dd2a7a409755836f130e57e, type: 3}
+    m_Font: {fileID: 12800000, guid: c962441d0c60e474b930efb3fa7ecf45, type: 3}
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 1
@@ -1053,7 +1053,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Share your thoughts!
+  m_Text: "Caption this photo!\n_____________\n_____________\n_____________\n\nSocial
+    media handles\n Phone numbers, etc"
 --- !u!222 &1426716345
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1562,7 +1563,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 26e9e8887dd2a7a409755836f130e57e, type: 3}
+    m_Font: {fileID: 12800000, guid: c962441d0c60e474b930efb3fa7ecf45, type: 3}
     m_FontSize: 14
     m_FontStyle: 0
     m_BestFit: 1

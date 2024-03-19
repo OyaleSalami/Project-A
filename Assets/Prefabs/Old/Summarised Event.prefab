@@ -607,7 +607,6 @@ GameObject:
   - component: {fileID: 5116923151004061182}
   - component: {fileID: 5116923151004061180}
   - component: {fileID: 5116923151004061181}
-  - component: {fileID: 2038953860954793466}
   m_Layer: 5
   m_Name: Summarised Event
   m_TagString: Untagged
@@ -677,23 +676,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2038953860954793466
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5116923151004061183}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba257b23e0aeaaa44a5516857093d1d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  postID: 
-  likes: {fileID: 4516498183574641915}
-  comments: {fileID: 3345605451968022830}
-  seen: {fileID: 5774703682652590600}
-  saves: {fileID: 4198943725980587834}
 --- !u!1 &5116923151404277664
 GameObject:
   m_ObjectHideFlags: 0

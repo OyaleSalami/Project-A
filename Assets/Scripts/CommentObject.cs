@@ -10,6 +10,9 @@ public class CommentObject : MonoBehaviour
     /// <summary>The Unique ID For This Comment</summary>
     public string commentId;
 
+    /// <summary>The Unique ID for the post the comment is on</summary>
+    public string postId;
+
     /// <summary>The Comment Descriptor</summary>
     public Comment comment;
 
@@ -30,13 +33,13 @@ public class CommentObject : MonoBehaviour
     public void UpdateUI()
     {
         commentText.text = comment.comment;
-        displayName.text = "@" + comment.displayName;
+        displayName.text = "   @" + comment.displayName;
     }
 
     public void LoadComment()
     {
         //Load the post from the database
-        GameManager.instance.dbReference.Child("comments").Child(commentId).GetValueAsync().ContinueWithOnMainThread(task =>
+        GameManager.instance.dbReference.Child("comments").Child(postId).Child(commentId).GetValueAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsFaulted)
             {
@@ -53,5 +56,4 @@ public class CommentObject : MonoBehaviour
             }
         });
     }
-
 }

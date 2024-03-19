@@ -21,13 +21,15 @@ public class PostObject : MonoBehaviour
     [SerializeField] Image displayImage;
     [SerializeField] GameObject commentPanel;
 
-    [Space(20)]
     [Header("Post UI")]
     [SerializeField] Text displayName;
     [SerializeField] Text viewCount;
-    [SerializeField] Text savesCount;
+    //[SerializeField] Text savesCount;
     [SerializeField] Text likesCount;
     [SerializeField] Text commentsCount;
+
+    [Header("Animations")]
+    [SerializeField] Animation likeAnimation;
 
     private bool loaded = false;
 
@@ -36,19 +38,37 @@ public class PostObject : MonoBehaviour
         commentPanel = GameObject.FindGameObjectWithTag("comments");
 
         //Load The Event If There Is A Given Post ID
-        if(!string.IsNullOrEmpty(postId))
+        if (!string.IsNullOrEmpty(postId))
         {
             LoadPost();
         }
+
+        //Setup Event Listeners
+        FirebaseDatabase.DefaultInstance.GetReference("posts").Child(postId).ValueChanged += HandleValueChanged;
+    }
+
+    private void HandleValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        // Do something with the data in args.Snapshot
+        Dictionary<string, object> dict = (Dictionary<string, object>)args.Snapshot.Value;
+
+        post = new Post(dict);
+        UpdateUI();
     }
 
     public void UpdateUI()
     {
-        viewCount.text     = TransformCount(post.viewCount);
-        likesCount.text    = TransformCount(post.likesCount);
-        savesCount.text    = TransformCount(post.savesCount);
+        viewCount.text = TransformCount(post.viewCount);
+        likesCount.text = TransformCount(post.likesCount);
+        //savesCount.text = TransformCount(post.savesCount);
         commentsCount.text = TransformCount(post.commentsCount);
-        displayName.text   = "   @" + post.displayName.ToString();
+        displayName.text = "  @" + post.displayName.ToString();
     }
 
     public void LoadPost()
@@ -88,7 +108,6 @@ public class PostObject : MonoBehaviour
             else
             {
                 Debug.Log("Error downloading image!" + task.Exception);
-                errorPanel.SetActive(true);
             }
         }
         );
@@ -102,7 +121,6 @@ public class PostObject : MonoBehaviour
         if (request.isHttpError || request.isNetworkError)
         {
             Debug.Log("Error Downloading the Image!");
-            errorPanel.SetActive(true);
         }
         else
         {
@@ -122,16 +140,52 @@ public class PostObject : MonoBehaviour
     public void CheckComments()
     {
         //TODO: Check the comments section
+        commentPanel.SetActive(true);
+        commentPanel.GetComponent<CommentManager>().postId = postId;
+        commentPanel.GetComponent<CommentManager>().Activate();
     }
 
     public void LikePost()
     {
-        //TODO: Like the post
+        IncreaseLikeCounter();
+        likeAnimation.Play();
+        UpdateUI();
     }
 
-    public void SavePost()
+    public void IncreaseLikeCounter()
     {
-        //TODO: Save the post to the user profile
+        GameManager.instance.dbReference.Child("posts").Child(postId).Child("likesCount").RunTransaction(task =>
+        {
+            int currentLikes = (int)task.Value; // Get current value
+            task.Value = currentLikes + 1; // Set the new value (current + 1)
+            return TransactionResult.Success(task);
+        });
+    }
+
+    public void IncreaseSavedCounter()
+    {
+        GameManager.instance.dbReference.Child("posts").Child(postId).Child("savesCount").RunTransaction(task =>
+        {
+            int currentSaves = (int)task.Value; // Get current value
+            task.Value = currentSaves + 1; // Set the new value (current + 1)
+            return TransactionResult.Success(task);
+        });
+    }
+
+    public void IncreaseViewCounter()
+    {
+        GameManager.instance.dbReference.Child("posts").Child(postId).Child("viewCount").RunTransaction(task =>
+        {
+            int currentViews = (int)task.Value; // Get current value
+            task.Value = currentViews + 1; // Set the new value (current + 1)
+            return TransactionResult.Success(task);
+        });
+    }
+
+    public void SavePost() //TODO: Save the post to the user profile
+    {
+        //Add event to users list of events
+        GameManager.instance.dbReference.Child("users").Child(post.userId).Child("posts").Push().SetValueAsync(postId);
     }
 
     string TransformCount(int val)
@@ -148,5 +202,4 @@ public class PostObject : MonoBehaviour
 
         return val.ToString();
     }
-
 }

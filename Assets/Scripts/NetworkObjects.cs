@@ -20,6 +20,9 @@ namespace Mumble
         /// <summary>The User's unique ID</summary>
         public string userId;
 
+        /// <summary>The unique ID of the Post</summary>
+        public string postId;
+
         public Comment()
         {
             likesCount = 0;
@@ -33,6 +36,7 @@ namespace Mumble
                 userId = _comment["userId"].ToString();
                 comment = _comment["comment"].ToString();
                 likesCount = int.Parse(_comment["likesCount"].ToString());
+                postId = _comment["postId"].ToString();
             }
             catch (Exception e)
             {

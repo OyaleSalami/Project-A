@@ -135,7 +135,6 @@ public class UploadManager : MonoBehaviour
 
                 //Add event to users list of events
                 GameManager.instance.dbReference.Child("users").Child(_temp.userId).Child("posts").Push().SetValueAsync(key);
-
             }
         }
         );
